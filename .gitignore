@@ -1,0 +1,33 @@
+# Binaries
+/go-fiber-auth
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Go build cache
+*.test
+*.out
+
+# Dependency directories (vendor/)
+vendor/
+
+# IDE & Editor settings
+.vscode/
+.idea/
+*.swp
+*.swo
+*.swn
+
+# Logs
+*.log
+
+# Environment & config files
+.env
+*.local
+
+# OS generated files
+.DS_Store
+Thumbs.db
+uploads/
