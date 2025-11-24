@@ -5,7 +5,6 @@ import (
 	"os"
 	"path/filepath"
 	"time"
-	"mime/multipart"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -33,26 +32,22 @@ func SaveUploadedFile(c *fiber.Ctx, fieldName, folder string) (string, error) {
 	return path, nil
 }
 
-func SaveUpdatedFile(c *fiber.Ctx, file *multipart.FileHeader, folder string, oldFilePath string) (string, error) {
-	// Pastikan folder ada
-	if err := os.MkdirAll(folder, os.ModePerm); err != nil {
-		return "", fmt.Errorf("failed to create directory: %w", err)
-	}
+func UpdateUploadedFile(c *fiber.Ctx, fieldName, uploadDir, oldPath string) (string, error) {
+    file, err := c.FormFile(fieldName)
+    if err != nil || file == nil {
+        return oldPath, nil // tidak upload baru → pakai image lama
+    }
 
-	// Buat nama file unik
-	filename := fmt.Sprintf("%d_%s", time.Now().Unix(), file.Filename)
-	fullPath := filepath.Join(folder, filename)
+    // hapus file lama jika ada
+    if oldPath != "" {
+        os.Remove(oldPath)
+    }
 
-	// Simpan file baru
-	if err := c.SaveFile(file, fullPath); err != nil {
-		return "", fmt.Errorf("failed to save file: %w", err)
-	}
+    // upload baru
+    newPath, err := SaveUploadedFile(c, fieldName, uploadDir)
+    if err != nil {
+        return oldPath, err
+    }
 
-	// Hapus file lama jika ada
-	if oldFilePath != "" {
-		_ = os.Remove(oldFilePath)
-	}
-
-	return fullPath, nil
+    return newPath, nil
 }
-
